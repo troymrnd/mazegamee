@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Time?</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #fce4ec; 
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10; 
+            position: relative;
+            /* Give it a defined width/height so we know where the bottom is */
+            width: 300px;
+            min-height: 250px; 
+            /* Push container up slightly so buttons fit below nicely */
+            margin-bottom: 20px; 
+        }
+
+        h1 {
+            color: #d81b60; 
+            margin-bottom: 20px;
+        }
+
+        .cat-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 30px;
+            border: 5px solid #ff80ab;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        /* --- Updated Container for the 'Yes' Button (Outside White Box) --- */
+        #yes-button-wrapper {
+            position: fixed; 
+            top: 75%; /* Shifted from 70% to 75% */
+            left: 50%;
+            transform: translateX(-50%); 
+            z-index: 11;
+        }
+        
+        /* Dedicated Full-Screen Container for the Moving 'No' Button */
+        #no-button-wrapper {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100vw; 
+            height: 100vh; 
+            pointer-events: none; 
+            z-index: 5; 
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap; 
+            pointer-events: auto; 
+        }
+
+        #yesBtn {
+            background-color: #4caf50; 
+            color: white;
+            text-decoration: none; 
+            margin-bottom: 15px; 
+            display: block;
+        }
+
+        #yesBtn:hover {
+            background-color: #45a049;
+            transform: scale(1.05); 
+        }
+
+        #noBtn {
+            background-color: #f44336; 
+            color: white;
+            position: absolute; 
+            /* --- Updated starting position for 'No' button --- */
+            top: 80vh; /* Shifted from 75vh to 80vh */
+            left: 50%;
+            transform: translateX(-50%); 
+            width: fit-content;
+        }
+
+        .large-cap-move {
+            font-size: 20px !important; 
+            padding: 15px 30px !important; 
+        }
+
+        @keyframes pulse {
+            from { border-color: #ff80ab; }
+            to { border-color: #d81b60; }
+        }
+
+        .success-message {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #4caf50;
+            font-weight: bold;
+            display: none; 
+            text-align: center;
+            z-index: 20;
+            position: fixed;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            /* Ensure it is centered and visible */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="gameContainer">
+        
+        <img class="cat-image" src="cat.gif" alt="Moving Cat GIF">
+        
+        <h1>Hello Baby,</h1>
+        <h1 style="color:gray;">Do you want to play with me?</h1>
+    </div>
+
+    <div id="yes-button-wrapper">
+       <a href="https://troymrnd.github.io/mazee/" class="btn" id="yesBtn" onclick="handleYes()">Yes, I want to play with you</a>
+    </div>
+
+    <div id="no-button-wrapper">
+        <button class="btn" id="noBtn" onmouseover="moveNoButton()" onclick="alert('You cant catch me!'); return false;">No, I'm too tired to play with you</button>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        Yay! I knew you'd say yes! Let's play! 💖
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const gameContainer = document.getElementById('gameContainer');
+        const noBtnWrapper = document.getElementById('no-button-wrapper'); 
+        const successMessage = document.getElementById('successMessage');
+        const yesBtnWrapper = document.getElementById('yes-button-wrapper'); 
+        let moveCount = 0; 
+        const maxMoves = 10; 
+
+        function moveNoButton() {
+            if (moveCount >= maxMoves) {
+                noBtn.style.transition = 'all 0.3s ease'; 
+                return; 
+            }
+
+            // Temporarily make the button larger and track the move
+            noBtn.classList.add('large-cap-move');
+            moveCount++;
+
+            // Use the full window size for the bounds
+            const containerWidth = window.innerWidth;
+            const containerHeight = window.innerHeight;
+            
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            
+            // Randomly calculates the new position across the entire viewport
+            const newX = Math.floor(Math.random() * (containerWidth - btnWidth));
+            const newY = Math.floor(Math.random() * (containerHeight - btnHeight));
+
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+            noBtn.style.transform = 'none'; // Remove any initial transform
+
+            // Use a short, fast transition for the move
+            noBtn.style.transition = 'all 0.1s ease-out';
+
+            // Remove the larger size class and fast transition after a moment
+            setTimeout(() => {
+                noBtn.classList.remove('large-cap-move');
+                noBtn.style.transition = 'none'; 
+            }, 100); 
+        }
+
+        function handleYes() {
+            // Hide the main content and both button wrappers
+            gameContainer.style.display = 'none';
+            noBtnWrapper.style.display = 'none';
+            yesBtnWrapper.style.display = 'none'; 
+            successMessage.style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = "success.html"; 
+            }, 2000); 
+        }
+    </script>
+</body>
+</html>
